@@ -124,4 +124,4 @@ runpodctl create pod --templateId x7o8gn1p4f --gpuCount 4 --gpuType "NVIDIA H100
 
 When using multiple GPUs, you will need to update `train.py` to use `torch.distributed` for multi-GPU training. This is within scope — `train.py` is the file you modify.
 
-**Note:** `runpodctl` requires a Runpod API key. If the `RUNPOD_API_KEY` environment variable is set (configurable in the pod template settings), it works automatically. Otherwise, ask the user for their key and run `runpodctl config --apiKey YOUR_KEY`.
+**API key:** Before scaling, check if `runpodctl` is configured by running `runpodctl get pod`. If it returns an auth error, ask the user to provide their Runpod API key (from https://console.runpod.io/user/settings > API Keys), then run `runpodctl config --apiKey <key>`. Do not proceed with pod creation until auth is working.
