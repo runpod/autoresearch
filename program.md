@@ -112,3 +112,18 @@ The idea is that you are a completely autonomous researcher trying things out. I
 **NEVER STOP**: Once the experiment loop has begun (after the initial setup), do NOT pause to ask the human if you should continue. Do NOT ask "should I keep going?" or "is this a good stopping point?". The human might be asleep, or gone from a computer and expects you to continue working *indefinitely* until you are manually stopped. You are autonomous. If you run out of ideas, think harder — read papers referenced in the code, re-read the in-scope files for new angles, try combining previous near-misses, try more radical architectural changes. The loop runs until the human interrupts you, period.
 
 As an example use case, a user might leave you running while they sleep. If each experiment takes you ~5 minutes then you can run approx 12/hour, for a total of about 100 over the duration of the average human sleep. The user then wakes up to experimental results, all completed by you while they slept!
+
+## Scaling up
+
+This section applies **during setup only**, before the experiment loop begins. Once the loop is running, do not interrupt it to scale — the "NEVER STOP" rule takes priority.
+
+If during setup you and the user agree the experiment needs more VRAM than a single GPU provides, you can create a new pod with multiple GPUs using `runpodctl`:
+
+```bash
+# Create a 4-GPU pod with the autoresearch template
+runpodctl create pod --templateId x7o8gn1p4f --gpuCount 4 --gpuType "NVIDIA H100 80GB HBM3" --name autoresearch-4gpu
+```
+
+The user then connects to the new pod and starts the experiment there. When using multiple GPUs, update `train.py` to use `torch.distributed` for multi-GPU training. This is within scope — `train.py` is the file you modify. Note that results from multi-GPU runs are not directly comparable to single-GPU runs.
+
+**API key:** `runpodctl` requires authentication. Check `RUNPOD_API_KEY` env var or run `runpodctl get pod` to test. If not configured, ask the user for their key during setup (not during the experiment loop) and run `runpodctl config --apiKey <key>`.
