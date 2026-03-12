@@ -115,13 +115,15 @@ As an example use case, a user might leave you running while they sleep. If each
 
 ## Scaling up
 
-If your experiment needs more VRAM than a single GPU provides (e.g. you want to train a larger model), you can create a new pod with multiple GPUs using `runpodctl`:
+This section applies **during setup only**, before the experiment loop begins. Once the loop is running, do not interrupt it to scale — the "NEVER STOP" rule takes priority.
+
+If during setup you and the user agree the experiment needs more VRAM than a single GPU provides, you can create a new pod with multiple GPUs using `runpodctl`:
 
 ```bash
 # Create a 4-GPU pod with the autoresearch template
 runpodctl create pod --templateId x7o8gn1p4f --gpuCount 4 --gpuType "NVIDIA H100 80GB HBM3" --name autoresearch-4gpu
 ```
 
-When using multiple GPUs, you will need to update `train.py` to use `torch.distributed` for multi-GPU training. This is within scope — `train.py` is the file you modify.
+The user then connects to the new pod and starts the experiment there. When using multiple GPUs, update `train.py` to use `torch.distributed` for multi-GPU training. This is within scope — `train.py` is the file you modify. Note that results from multi-GPU runs are not directly comparable to single-GPU runs.
 
-**API key:** Before scaling, check if `runpodctl` is configured by running `runpodctl get pod`. If it returns an auth error, ask the user to provide their Runpod API key (from https://console.runpod.io/user/settings > API Keys), then run `runpodctl config --apiKey <key>`. Do not proceed with pod creation until auth is working.
+**API key:** `runpodctl` requires authentication. Check `RUNPOD_API_KEY` env var or run `runpodctl get pod` to test. If not configured, ask the user for their key during setup (not during the experiment loop) and run `runpodctl config --apiKey <key>`.
